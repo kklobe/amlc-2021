@@ -1,4 +1,6 @@
 gurobipy
+networkx
 numpy
 pandas
 scipy
+xlrd
