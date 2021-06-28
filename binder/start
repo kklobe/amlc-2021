@@ -1,4 +1,4 @@
-#!/bin/bashi
+#!/bin/bash
 
 export GRB_LICENSE_FILE=/home/${USER}/gurobi/gurobi.lic
 
