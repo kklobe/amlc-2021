@@ -1,5 +1,5 @@
-#!/bin/bash
+#!/bin/bashi
 
-export GRB_LICENSE_FILE=/home/${USER}/gurobi.lic
+export GRB_LICENSE_FILE=/home/${USER}/binder/gurobi.lic
 
 exec "$@"
