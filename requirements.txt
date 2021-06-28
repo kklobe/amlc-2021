@@ -1,6 +1,7 @@
 gurobipy
+jupytext
 networkx
 numpy
+openpyxl
 pandas
 scipy
-xlrd

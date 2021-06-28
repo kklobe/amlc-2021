@@ -1,0 +1,3 @@
+#!/bin/bash
+
+export GRB_LICENSE_FILE=/home/$USER/gurobi.lic
