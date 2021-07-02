@@ -54,7 +54,7 @@ df.set_index('Name',inplace=True)
 names = df.index
 
 # Define connections
-connections = [(o, d) for o in names for d in names if o != d]
+connections = [(o, d) for o in names for d in names if o != d and o != 'Plat']
 
 # Calculate distances
 distances = {(o,d): np.sqrt((df.loc[o, 'Easting'] - df.loc[d, 'Easting'])**2 + 
@@ -71,4 +71,44 @@ def check_if_crossing(df, o1, d1, o2, d2):
     if o1 in [o2, d2] or d1 in [o2, d2]:
         return False
     return line1.crosses(line2)
+
+
+
+# +
+# Define the positions
+pos = {n : (df.loc[n, 'Easting'], df.loc[n, 'Northing']) for n in names}
+
+# Draw the units only ones
+H = nx.Graph()
+H.add_nodes_from([n for n in names])
+nx.draw_networkx_nodes(H, pos, node_size = 100, node_color='y')
+nx.draw_networkx_labels(H, pos);
+plt.rcParams["figure.figsize"] = (200,100)
+
+# +
+model = gp.Model("TiredAfternoonModelling")
+
+x = model.addVars(connections, vtype=gp.GRB.BINARY, name='install')
+f = model.addVars(connections, name='flow')
+
+model.addConstrs((x.sum(i,'*') == 1 for i in names), name='All connected')
+model.addConstrs((f.sum(i,'*') == f.sum('*',i) + produced for i in names if i != 'Plat'), 
+                 name='Flow')
+
+model.addConstrs((f[c] <= capacity*x[c] for c in connections), 'Semi-continuous variable')
+
+model.addConstrs((x[c] == 0 for c in connections if distances[c] >= 10), name='test')
+
+model.setObjective(x.prod(distances))
+# -
+
+model.optimize()
+
+# Draw the edges that actually exist
+G = nx.Graph()
+G.add_edges_from([(i, j) for (i,j) in connections if x[i,j].x > 0.5])
+nx.draw_networkx(G, pos, node_size = 100, node_color='y')
+nx.draw_networkx_labels(H, pos);
+plt.rcParams["figure.figsize"] = (200,100)
+
 

@@ -10,7 +10,6 @@
 
 # %%
 import gurobipy as gp
-import time
 
 
 DC = ['seattle','san-diego']
@@ -25,4 +24,27 @@ Distances = {
     ('san-diego','chicago')  : 1.8,
     ('san-diego','topeka')   : 1.4,
 }
-Price = 90
+Price = 90  # $/[1000km * unit]
+
+# %%
+model = gp.Model("AMLC2021")
+
+x = model.addVars(DC, FC, name='flow')
+
+model.addConstrs((x.sum(i,'*') <= Capacity[i] for i in DC), name='Capacity')
+model.addConstrs((x.sum('*',j) >= Demand[j] for j in FC), name='Demand')
+
+model.setObjective(Price*x.prod(Distances))
+
+
+# %%
+model.optimize()
+
+# %%
+for v in x:
+    print(f'{v}: {x[v].x}')
+
+# %%
+model.ObjVal
+
+# %%
